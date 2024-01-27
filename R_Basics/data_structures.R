@@ -91,7 +91,10 @@ is.vector(x)
   d[d$ages<40,]  # logical subsetting of a data frame
                  # we will print all columns and only those rows marked TRUE
                  # a row is marked true if the value in its age column is less than 40
+  d
+  d[d$ages<40 & d$ages > 10,] # people older than 10 but younger than 40
   
-  
-  
+  d <- mtcars
+
+  d[d$cyl == 4 & d$mpg < 25, ]  
   
