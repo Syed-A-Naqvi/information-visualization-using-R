@@ -3,76 +3,81 @@ graphics.off()
 rm(list=ls())
 library(tidyverse)
 
-#### 1. Read Csv ####
-d <- read_csv("./unemployment-rate-1948-2010.csv")
+# loading the data
+d <- read_csv("http://datasets.flowingdata.com/unemployment-rate-1948-2010.csv")
 
-#### 2. Create Scatter Plot ####
-plot(d$Year, d$Value, xlab="Year", ylab="Value")
+# exploring the data
+head(d)
+plot(x=d$Year, y=d$Value,
+     xlab = "Year", ylab="Unemployment Percentage",
+     ylim=c(0,12))
 
-#### 3. Create a linear model ####
+# creating a linear model
 m <- lm(d$Value~d$Year)
 
-#### 4. Create a linear model ####
+# overlaying regression line for the linear model
 abline(m, col="red", lwd=2)
 
-#### 5. Create a linear model ####
+# summarizing model
 summary(m)
-
-# the F-statistic of 66 and the p-value far below 0.05 indicate that the
-# linear model is statistically significant and the unemployment rate in the US
-# has seen an overall increase but the very low R-squared value indicates that
-# this linear model explains very little of the variance in the data.
-# this means that although the model does indicate a statistically significant
-# relation between the variables Year and Value, it is a poor fit to the data,
-# explaining very little variance
-
-#### 6. Local Regression fit ####
-scatter.smooth(x = d$Year, y = d$Value)
-abline(m,col="red")
-
-#### 7. adjusting the degree, span and line stylings for scatter.smooth() ####
-scatter.smooth(x = d$Year, y = d$Value,
-               degree = 2, span = 0.25,
-               col="light grey", lpars=list(col="red", lwd = 3, lty = 3))
-
-# a better approach would be to create the plot first and then add lines
-plot(x = d$Year, y = d$Value, col="light grey")
-lines(loess.smooth(x = d$Year, y = d$Value, span = 0.5, degree = 2),
-      col="red", lty = 3, lwd = 3)
+  # here the summary indicates there is statistical significance due to a p-value < 0.05
+  # however the low R-squared values indicate only 8% of variance in the data is explained by our linear model
 
 
 #### 0. Setup Worksapce ####
 graphics.off()
 rm(list=ls())
-library(tidyverse)
 
-#### creating a local regression model ####
-  # 1. Loading data
-  d <- read_csv("./unemployment-rate-1948-2010.csv")
+# loading the data
+d <- read_csv("http://datasets.flowingdata.com/unemployment-rate-1948-2010.csv")
+
+# fitting a loess line to the data using scatter.smooth() creates a new plot with loess model by default
+  # degree refers to the degree of the polynomial that is fit to the data (scatter.plot() only allows degree=0,1 or 2)
+  # span refers to local range of data incorporated into a single fit,
+  #   ex, span=0.5: separate fit for first 50% and second 50%
+  # lpars parameter takes a list of line characteristics
+  line = list(col="red", lwd=3, lty=3)
+  scatter.smooth(x=d$Year, y=d$Value, col= "light grey",
+                 xlab = "Year", ylab="Percentage Unemployment",
+                 degree = 2, span=0.25, lpars = line)
   
-  # 2. plotting the data
-  plot(x = d$Year, y = d$Value, xlab = "Year(y)", ylab = "Unemployment rate (%)",
-       col = "gray40")
+
+#### 0. Setup Worksapce ####
+graphics.off()
+rm(list=ls())
+
+# loading the data
+d <- read_csv("http://datasets.flowingdata.com/unemployment-rate-1948-2010.csv")
   
-  # 3. creating the local regression model - here we are just fitting the data
-  mod <- loess(d$Value ~ d$Year, span = 0.5, degree = 1)
+    
+# fitting a loess regressio to our data by first plotting the data and then adding a line afterwards
+  # plotting the data normally
+  plot(x=d$Year, y=d$Value, col="light grey", ylim = c(0,12))
+  # using the lines() function to it a loess regression line
+  lines(loess.smooth(d$Year, d$Value, span=0.5, degree = 2), col="red", lty = 3, lwd = 3)
 
-  # 4. adding the local regression line to the plot
-  lines(mod, col = "blue2", lwd = 3, lty = 3)
-
-  # 1. Loading data
-  d <- read_csv("./unemployment-rate-1948-2010.csv")
   
-  # 2. plotting the data
-  plot(x = d$Year, y = d$Value, xlab = "Year(y)", ylab = "Unemployment rate (%)",
-       col = "gray40")
+  #### 0. Setup Worksapce ####
+  graphics.off()
+  rm(list=ls())
   
-  # 3. creating the local regression model - here we are predicting values
-  mod <- predict(loess(Value ~ Year, data = d, span = 0.5, degree = 1), se=T)
+  # loading the data
+  d <- read_csv("http://datasets.flowingdata.com/unemployment-rate-1948-2010.csv")
   
-  # 4. adding the local regression line to the plot
-  lines(d$Year, mod$fit, col = "blue2", lwd = 3)
-
-
-
-
+  
+  # fitting a loess regressio to our data by first plotting the data and then adding a line afterwards
+  # plotting the data normally
+  plot(x=d$Year, y=d$Value, col="gray40", xlab="Year", ylab="Unemployment Rate (%)", ylim = c(0,12))
+  # creating a loess regression model
+  mod <- loess(d$Value~d$Year, span = 0.5, degree = 1)
+  # using the loess regression model to predict the y-values for each x value
+  mod <- predict(mod, se=T)
+  lines(d$Year, mod$fit, col="blue", lwd = 3)
+  
+  # adding 95% confidence interval lines to the plot
+  lines(d$Year, mod$fit + qt(0.975,mod$df)*mod$se.fit)
+  lines(d$Year, mod$fit - qt(0.975,mod$df)*mod$se.fit)
+  
+  
+  
+  
