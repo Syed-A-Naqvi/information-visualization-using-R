@@ -28,20 +28,33 @@ graphics.off()
 rm(list=ls())
 
 p <- ggplot(mpg, aes(x = cty, y = hwy))
-
-p + geom_point(aes(colour = manufacturer))
-p + geom_point(aes(shape = drv, colour = drv))
+p + geom_point()
+p + geom_point(aes(shape = drv))
 p + geom_point(aes(size = cyl))
+
+
 
 ## coding challenge 2 ##
 graphics.off()
 rm(list=ls())
 
-g <- ggplot(mpg, aes(x = class))
-
-g + geom_bar(aes(fill = drv)) + ggtitle("drive train distribution")
+g <- ggplot(mpg, aes(x = class)) +
+  geom_bar(aes(fill = drv)) +
+  ggtitle("Number of Vehicle Per Classes by Drive Train")
+g
 
 ## coding challenge 3 ##
+d <- gss_cat |>
+  as_tibble() |> 
+  drop_na(tvhours) |> 
+  group_by(rincome) |> 
+  mutate(avg_tvhours = mean(tvhours))
+
+ggplot(d, aes(x = avg_tvhours, y = rincome)) +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Average TV Hours vs Income Bracket", x = "TV Hours", y = "Income Bracket")
+
 
 
     

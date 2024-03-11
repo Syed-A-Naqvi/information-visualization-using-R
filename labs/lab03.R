@@ -33,7 +33,6 @@ library(tidyverse)
   #8. adding 95% confidence intervals
   lines(d$carat, mod$fit + qt(0.975, yfit$df)*yfit$se.fit)
   lines(d$carat, mod$fit - qt(0.975, yfit$df)*yfit$se.fit)
-    
   
   
   
