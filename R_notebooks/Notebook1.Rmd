@@ -1,0 +1,65 @@
+---
+title: "My first notebook"
+output:
+  html_notebook
+---
+
+```{r, libraries}
+library(ggplot2)
+```
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  scale_x_continuous(name = "My x axis")
+```
+
+
+```{r}
+dim(mpg)
+m <- lm(hwy ~ displ, data = mpg)
+plot(cars)
+```
+
+
+```{r}
+```
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r, include=TRUE}
+plot(cars)
+```
+
+
+```{r, include=TRUE}
+plot(iris)
+```
+
+
+```{r, include=TRUE}
+x = seq(1,10)
+length(x)
+```
+
+```{r, include=TRUE}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point()
+```
+
+```{r}
+plot(mpg$cty,mpg$displ)
+```
+
+```{r}
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+

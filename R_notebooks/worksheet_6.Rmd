@@ -1,0 +1,125 @@
+---
+title: "Worksheet 6"
+author: "Syed Naqvi - 100590852"
+date: "2024-03-22"
+output:
+  html_document:
+  toc: true
+  toc_depth: 2
+  dev: 'svg'
+---
+<!-- Part 1 #1: create a new R notebook that outputs in html format -->
+
+```{r}
+
+#Part 1 - R Notebook
+
+  ## initializing environment
+  graphics.off()
+  rm(list = ls())
+  library(tidyverse)
+  library(patchwork)
+
+  # 2.
+  d <- read_csv("./w6.csv")
+
+```
+
+```{r}
+  # 3.
+  d <- d |> 
+    mutate(Response = factor(Response,
+                             levels = c(1,2, 3, 4, 5),
+                             labels = c("Never", "Rarely", "Sometimes", "Often", "Always")))
+```
+
+```{r}
+  # 4.
+  d <- d |> 
+    mutate(Gender = factor(Gender,
+                             levels = c(1,2),
+                             labels = c("Women", "Men")))
+```
+
+```{r}
+  # 9.
+  levels(d$Response) <- c("Not at all", "A little", "Somewhat", "A lot", "PC Load letter?")
+```
+
+
+```{r}
+# Part 2 - Plotting
+  # 1.
+  plot <- d |> 
+    ggplot(aes(x="", y=Summary, fill=Response)) +
+    geom_col(width = 1, color = "azure2") +
+    coord_polar(theta = "y") +
+    facet_wrap(~Gender)
+```
+
+```{r}
+  # 2.
+  plot <- plot +
+    scale_fill_brewer(palette = "Blues")
+```
+
+```{r}
+  # 3.
+  plot <- plot +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank()) +
+    scale_y_continuous(breaks = seq(0.1, 1, by = 0.1),
+                       labels = scales::percent(seq(0.1, 1, by = 0.1)))
+```
+
+```{r}
+  # 4.
+  plot <- plot +
+    guides(fill = guide_legend(reverse=TRUE))
+  
+  ### in order to set the color to "azure2" i went back to the geom_col layer and set color = "azure2"
+
+```
+
+```{r}
+  # 5.
+  plot <- plot +
+    theme(legend.position = "bottom",
+          legend.text = element_text(size = 10),
+          legend.direction = "horizontal")
+```
+
+```{r}
+  # 6.
+  #install.packages("ggthemes")
+  library(ggthemes) 
+```
+
+```{r}
+  #7.
+  ?ggthemes
+```
+
+```{r}
+  # 8.
+  plot <- plot + theme_stata()
+  plot <- plot + theme_economist_white() 
+```
+
+```{r}
+  # 9.
+  plot <- plot +
+    theme(legend.position = "bottom",
+    legend.text = element_text(size = 10),
+    legend.direction = "horizontal",
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()) +
+    labs(title = "A meta-survey: \"How much do you hate surveys?\"")
+```
+
+```{r}
+  plot
+```
+
+
+

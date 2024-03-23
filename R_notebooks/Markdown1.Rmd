@@ -1,0 +1,90 @@
+---
+title: "My first markdown"
+author: "SR Livingstone"
+date: "2023-03-09"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 1
+    dev: 'png'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, collapse = TRUE)
+```
+
+```{r libraries, include=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+# First-level header
+## Second-level header
+### Third-level header
+
+## This is a header
+#### This is a subheading
+
+This is a paragraph. This text is *italicised*, this is **bold**.
+
+This is `Verbatim text`.
+
+1. Ordered List Item 1
+    1. Subitem 1
+    2. Subitem 2
+2. OLI 2
+    + Subitem 1
+    + Subitem 2
+
+Here's an unordered list:
+
+- Unordered List Item 1
+   + Subitem 1
+- ULI2
+   + Subitem 1
+
+sub~script~
+
+super^script^
+
+`code appearance`
+
+[google](http://google.com)
+
+This text needs a footnote^[This is a meaningful caveat about what I just said...]
+
+![](images/hex-rmarkdown.png){width=10%}
+
+> "Wise men talk because they have something to say; fools, because they have to say something"
+>
+> Plato
+
+```
+dim(d)
+plot(cars)
+m <- lm(y ~ x)
+```
+
+
+|Table Header | Second Header | Third Header |
+|:----------- | :-----------: | :----------- |
+|Table Cell 1 | Table Cell 2  | Table Cell 3 |
+|Table Cell 4 | Table Cell 5  | Table Cell 6 |
+
+
+Here is some embedded code:
+
+```{r, echo=TRUE, include=TRUE, cache=TRUE, fig.height = 2, fig.cap="Fig 1. Effect of engine displacement on Highway mileage"}
+# Linear model
+m <- lm(hwy ~ displ, data = mpg)
+# Beta coefficients
+b <- coef(m)
+# Plot
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+
+
+## Analyses
+The slope of the regression is: `r  b[2]`

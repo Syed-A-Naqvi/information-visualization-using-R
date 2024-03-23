@@ -155,6 +155,12 @@ Oxboys |>
   ## FORMAL DEFINITION ##
   # scales are a mapping from dataspace to visual aesthetic space and the legends are like
   # the inverse map that allow the visuals to be mapped back to data
+  # So, in a sense, aesthetics tell ggplot "what" to change visually based on your data,
+  # and scales tell ggplot "how" to change it.
+    # so for example, an aesthetic could map values of a variable to colors but the scale
+    # would tell which value in the variable maps to which color i.e "how" to map values to colors
+    # or the aesthetic could map values to size of a point in a geom_point but the scale would
+    # tell ggplot which values correspond to what size
   
   ggplot(mpg, aes(x = displ, y = hwy)) +
     geom_point(aes(colour = class))
