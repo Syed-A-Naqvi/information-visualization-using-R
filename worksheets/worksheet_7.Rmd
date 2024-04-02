@@ -1,0 +1,63 @@
+---
+title: "Worksheet 7"
+author: "Syed Naqvi"
+date: "2024-03-31"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    dev: 'svg'
+---
+
+## Initialization
+
+```{r}
+graphics.off()
+rm(list=ls())
+packages <- c("patchwork", "tidyverse", "sf", "ozmaps")
+lapply(packages, library, character.only=TRUE)
+```
+
+## Part 1 - Maps
+### 1. loading Australian 'States' map and filtering out 'Other Territories'
+
+```{r}
+  oz_states <- ozmap_data('states') |>
+    filter(!(NAME == "Other Territories"))
+```
+
+### 2. using sf to visualize the map
+
+```{r}
+  p <- oz_states |> 
+    ggplot() +
+    geom_sf() +
+    coord_sf(crs = st_crs(7844))
+  p
+
+```
+
+### 3. generating finalized map
+
+```{r,fig.height=9,fig.width=9}
+  p <- oz_states |> 
+    ggplot() +
+    geom_sf(aes(fill = NAME), colour = "grey20", linewidth = 0.2) +
+    geom_sf_label(aes(label = NAME)) +
+    scale_fill_viridis_d() +
+    guides(fill = "none") +
+    theme(axis.title = element_blank()) +
+    coord_sf(crs = st_crs(7844)) +
+    labs(title = "Dont't dream it's over")
+  p
+```
+
+
+
+
+
+
+
+
+
+

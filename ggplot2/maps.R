@@ -9,6 +9,8 @@ library(patchwork)
 library(maps)
 library(socviz)
 library(ggthemes)
+library(sf)
+
 
 
 ad1 <- geo("Ontario tech university")
@@ -100,11 +102,79 @@ p1 <- d_us_election |>
   scale_fill_manual(values = party_colors) +
   theme_map() +
   theme(legend.position = "bottom",
-        plot.title = element_text(size = 22),
+        plot.title = element_text(size = 22, margin = margin(t = 15, unit = "pt"), hjust = 0.5, vjust = 0.5),
         legend.text = element_text(size = 12),
-        legend.title = element_text(size = 15)) +
-  labs(title = "2016 US presidential election, coloured by state-party win", fill = "Party")
-p1
+        legend.title = element_text(size = 15),
+        legend.margin = margin(b = 10, unit = "pt")) +
+  labs(title = "2016 US Presidential General Election     (coloured by state-party win)", fill = "Party")
+
+view(county_map[1:10,])
+view(county_data[1:10,])
+
+d_county_map <- left_join(county_map, county_data, join_by(id)) |> 
+  as_tibble() |> 
+  rename(lon = long)
+view(d_county_map[1:20,])
+
+colors <- viridis::cividis(length(unique(d_county_map$pct_black)))
+
+p2 <- d_county_map |>
+  mutate(pct_black = factor(pct_black)) |> 
+  ggplot(aes(x=lon, y=lat, group = group, fill=pct_black)) +
+  geom_polygon(colour="grey", linewidth=0.1) +
+  coord_equal() +
+  theme_map() +
+#  scale_fill_brewer(palette = "Blues", labels = c("0-10","10-50","50-100","100-500","500-1000","1000-5000","> 5000")) +
+  scale_fill_brewer(palette = "Greys", labels = c("0% - 2.0%", "2.0% - 5.0%", "5.0% - 10.0%", "10.0% - 15.0%",
+                                                  "15.0% - 25.0%", "25.0% - 50.0%", "50.0% - 85.3%")) +
+#  scale_fill_manual(values = colors,
+#                    labels = c("0% - 2.0%", "2.0% - 5.0%", "5.0% - 10.0%", "10.0% - 15.0%",
+#                                                  "15.0% - 25.0%", "25.0% - 50.0%", "50.0% - 85.3%")) +
+  labs(fill = "Percent Black Population", title = "Black Populations in the United States by County") +
+  theme(plot.title = element_text(size = 22), legend.position = "bottom") +
+  guides(fill = guide_legend(nrow = 1))
+p2
+
+nc <- st_read(system.file("shape/nc.shp", package = "sf"))
+print(nc, n=3)
+ggplot(nc) +
+  geom_sf(aes(fill = BIR79)) +
+  scale_fill_viridis_c(name = "Live Births") +
+  coord_sf(crs = st_crs(4326)) +
+  theme_map()
+
+d_county <- st_as_sf(maps::map("county", plot = FALSE, fill = TRUE))
+
+d_county <- d_county |> 
+  inner_join(county.fips, join_by(ID==polyname)) |> 
+  left_join(county_data, join_by(fips==fips))
+
+library(scales)
+p <-d_county |> 
+  ggplot() +
+  theme_map() +
+  geom_sf(aes(fill = d_county$hh_income), colour = "grey") +
+  scale_fill_gradient2(low = "red",
+                       mid = "white",
+                       high = "green",
+                       midpoint = median(d_county$hh_income)) +
+  coord_sf(crs = st_crs(4326)) +
+  theme(legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.key.width = unit(1.5, "cm")) +
+  labs(title = "Average US Household Income by County", fill = "Income USD")
+p  
+
+d_state = st_as_sf(maps::map('state', plot = FALSE, fill = TRUE))
+d_cities = st_as_sf(us.cities, coords = c("long", "lat"), crs = 4326, remove = FALSE) |> 
+  filter(!(country.etc %in% c("AK","HI")), pop > 4e5)
+
+p + geom_sf(data = d_cities, size = 2, colour = "black", alpha = 0.5) +
+  geom_sf_label(data = d_cities, aes(label = name), nudge_x = 0.1, nudge_y = 0.1, size = 2) +
+  geom_sf(data = d_state, fill = NA, colour = "grey30", linewidth = 0.35) +
+  theme(axis.title = element_blank())
+
+
 
 
 
