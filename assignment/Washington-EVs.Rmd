@@ -1,8 +1,27 @@
+---
+title: "Analysis of Electric Vehicles Registered in the State of Washington"
+author: "Syed Naqvi - 100590852"
+date: "`r format(Sys.Date(), '%d %B, %Y')`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+# Introduction
+
+The purpose of this analysis was to explore the distribution of electric vehicles registered in the American state of Washington. We will be exploring manufacturers and models with the greatest market-share in the state, top performing models in terms of their range and the overall distribution of Teslas as they currently dominate the EV market.  
+
+The dataset used is called 'Electric Vehicle Population Data' and is provided by the Washington State department of Licensing. Findings should reflect most recent conditions as data and metadata were both updated March 12th, 2024. 
+
+## Initializing Environment and Loading Data
+
+```{r}
 ### INITIALIZING ###
-graphics.off()
-rm(list=ls())
-map_packages <- c("ggrepel", "patchwork", "socviz", "tidyverse", "ggthemes", "tidygeocoder", "sf", "ozmaps", "maps", "mapdata", "mapproj", "rmapshaper", "devtools")
-lapply(map_packages, library, character.only=TRUE)
+  graphics.off()
+  rm(list=ls())
+  map_packages <- c("ggrepel", "patchwork", "socviz", "tidyverse", "ggthemes", "tidygeocoder", "sf", "ozmaps", "maps", "mapdata", "mapproj", "rmapshaper", "devtools")
+  lapply(map_packages, library, character.only=TRUE)
 
 ### DATA CLEANING ###
   
@@ -16,13 +35,24 @@ lapply(map_packages, library, character.only=TRUE)
     select(c("Model Year", "Make", "Model",
              "Electric Range")) |> 
     rename(make = Make, model = Model, modelYear = 'Model Year', range = 'Electric Range')
-  
-# Histogram that counts the number of EVs by make
+```
+
+
+# Graphic Analysis 1
+
+## Plot 1 - Vehicle Distribution by Manufacturer
+
+```{r plot1, echo=TRUE, fig.height=15, fig.width=15}
+# R code to generate the first plot\
+
+## Histogram counting the number of EV's by make ##
+  # preliminary data manipulation and tidying
   make_count <- d |>
     count(make, name = "count") |>
     arrange(desc(count)) |> 
     mutate(over_10k = count > 10000)
   
+  # generating the histogram
   make_hist <- make_count |> 
     ggplot() +
     geom_col(aes(x = count,
@@ -53,13 +83,23 @@ lapply(map_packages, library, character.only=TRUE)
     geom_vline(xintercept = 10000, linetype = "dashed", color = "black", linewidth = 0.5) +  # Add vertical line
     annotate("text", x = 10000, y = 5, label = "10000 units", color = "black", hjust = -0.2, vjust = -25) +  # Add label for the line
     guides(fill = guide_legend(reverse = TRUE))
+  print(make_hist)
 
-# while "TESLA" represents the overwhelming majority of registered EVs "NISSAN" and "CHEVROLET" also have a significantly larger
-# amount of registered models as compared to the other manufacturers
-# Lets create another histogram this time comparing the average vehicle ranges of the manufacturers
-# perhaps the most numerous makes will also have the highest average vehicle ranges?
+```
+
+## Plot 1 - Discussion
+
+The first graphic was intended for initial exploration and getting a sense of the dominant EV manufacturers. We can see clearly that Tesla represents the overwhelming majority of registered EVs with Nissan and Chevrolet at far second and third respectively, all three having more than 10k registered units.
+
+
+## Plot 2 - Average Vehicle Range by Manufacturer
+
+```{r plot2, echo=TRUE, fig.height=15, fig.width=15}
+## Bar plot visualizing average EV range by manufacturer
+  # this vector will store the top three most frequent vehicle makes 
   above_10k_units <- make_count$make[1:3]
     
+  # constructing new tibble for average range plot
   make_range <- d |> 
     filter(!(range == 0)) |> 
     group_by(make) |> 
@@ -67,6 +107,7 @@ lapply(map_packages, library, character.only=TRUE)
     arrange(desc(avg_range)) |> 
     mutate(over_10k = if_else(make %in% above_10k_units, TRUE, FALSE))
   
+  # generating plot
   make_range_bar <- make_range |> 
     ggplot() +
     geom_col(aes(x = avg_range,
@@ -76,7 +117,8 @@ lapply(map_packages, library, character.only=TRUE)
          subtitle = "Both Plug-in and Battery EVs included in average",
          x = "Average Range (miles)",
          y = "Vehicle Make") +
-    scale_fill_manual(values = c("TRUE" = "firebrick", "FALSE" = "grey30")) +
+    scale_fill_manual(values = c("TRUE" = "firebrick", "FALSE" = "grey30"),
+                      name = "Above 10k Registered Units") +
     theme(
       axis.line.x.bottom = element_line(linewidth = 0.5, colour = "black"),
       axis.line.y.left = element_line(linewidth = 0.5, colour = "black"),
@@ -84,17 +126,24 @@ lapply(map_packages, library, character.only=TRUE)
       axis.title.x = element_text(size = 12),
       plot.title = element_text(size = 14, face = "bold"),
       plot.subtitle = element_text(size = 10),
-      plot.margin = margin(b=10, r=10, l=10, t=10, unit = "pt"),
-      legend.position = "none"
+      plot.margin = margin(b=10, r=10, l=10, t=10, unit = "pt")
     ) +
     guides(fill = guide_legend(reverse = TRUE))
-  make_range_bar + make_hist
-  
-# we can see that "TESLA" "NISSAN" and "CHEVROLET" also have substantial avg vehicle ranges above 100 miles
-  
-# lets now look at how the average range of the models for the above manufacturers have changed over time
-  
-  # extracting and summarizing records for only these manufacturers
+  print(make_range_bar)
+```
+
+## Plot 2 - Discussion
+
+It seemed plausible that EVs with better performance in range would likely be more sought after leading to more registered units. The second graphic explores just this relation and we do find that the top three manufacturers in terms of registered vehicles have above 100 miles of average range across their models placing them among the top 6 manufacturers for range.
+
+
+# Graphic Analysis 2
+
+## Plot 3 - Change in EV Range by Model and Manufacturer
+
+```{r plot3, echo=TRUE, fig.height=15, fig.width=15}
+
+# extracting and summarizing records for only these manufacturers
   long_range_data <- d |>
     filter((make %in% c("TESLA", "NISSAN", "CHEVROLET")),  !(range == 0)) |> 
     group_by(make, model, modelYear) |> 
@@ -114,16 +163,16 @@ lapply(map_packages, library, character.only=TRUE)
   #creating faceted plots where the points are connected by grouped lines
   range_plot <- long_range_data |> 
     ggplot(aes(x = modelYear, y = avg_range)) +
-    geom_line(aes(group = model, color = model)) +  # Connect data points by model group with lines
-    geom_point(aes(group = model, color = model)) +  # Add data points
-    facet_wrap(~make, scales = "free") +  # Create a separate plot for each manufacturer
+    geom_line(aes(group = model, color = model)) +
+    geom_point(aes(group = model, color = model)) +
+    facet_wrap(~make, scales = "free") +
     labs(
       title = "Evolution of Electric Vehicle Ranges by Make and Model",
       x = "Model Year",
       y = "Average Range (miles)",
       colour = "Model"
     ) +
-    scale_x_continuous(breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 1)) +  # Adjust x-axis to increment by 1 year
+    scale_x_continuous(breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 1)) +
     scale_color_brewer(palette = "Paired") +
     theme_minimal() +
     theme(
@@ -135,17 +184,25 @@ lapply(map_packages, library, character.only=TRUE)
       axis.title.y = element_text(margin = margin(r=10, unit = "pt")),
       plot.title = element_text(size = 16, face = "bold"),
       
-      strip.background = element_rect(fill = "grey90"),  # Customize the look of facet labels
-      strip.text.x = element_text(face = "bold"),  # Bold facet titles for clarity
+      strip.background = element_rect(fill = "grey90"),  
+      strip.text.x = element_text(face = "bold"), 
       legend.background = element_rect(fill = "white")
     )
   range_plot
-  
-# we can see that generally most ev's have managed to increase their average range over their iterations
-# the Tesla Model 3 and S both seemed to initially decrease in their average ranges before making improvements
-    
-# let us now examine the proportion of the top 7 most numerous models and see how they compare to the remaining
-# models by all other manufacturers
+
+```
+
+## Plot 3 - Discussion
+
+With this plot, the goal was to understand changes in EV range over multiple model iterations. The choice was made to consider again, the top three most numerous manufacturers as they were also amongst the brands with the longest range and seemed likely to provide more extensive information regarding their various EV models. Models with only one iteration were removed from the data as improvements or deteriorations could not be observed.
+We found that nearly all models saw either range stagnation or improvement over time other than the Tesla models S and 3 who initially saw decreases in range but eventually made improvements.
+
+
+# Graphic Analysis 3
+
+## Plot 4 - Proportion of Registered EV Models
+
+```{r plot4, echo=TRUE, fig.height=15, fig.width=15}
 
   # Total number of vehicles
   total_vehicles <- nrow(d)
@@ -172,8 +229,8 @@ lapply(map_packages, library, character.only=TRUE)
 # creating a pie chart of the above data
   
   # Calculate label positions
-  model_percentages <- model_percentages %>%
-    arrange(desc(model)) %>%
+  model_percentages <- model_percentages |> 
+    arrange(desc(model)) |> 
     mutate(cumsum = cumsum(percentage),
            pos = cumsum - percentage / 2,
            label = scales::percent(percentage))
@@ -204,11 +261,21 @@ lapply(map_packages, library, character.only=TRUE)
   # Display the pie chart
   pie_chart
 
-# as expected the most numerous ev models registerd in washington state are belong to the three most numerous makes
-  # we can see that the tesla model 3 and model Y both make up a substantial portion of all ev registrations
-  
-# Lets look at the country wide distribution of TESLAs
-  # Extracting extracting state and county information from raw dataset
+```
+
+
+## Plot 4 - Discussion
+
+Extracting the top seven most numerous models as opposed to manufacturers allowed us to view the EV distribution through a different lens. We can see that Telsa models as expected comprise of more EVs than the entire OTHER section. Also as expected, Nissan and Chevrolet occupy their familiar second and third place roles as single brands. We have also found that Tesla Model Y is the most registered EV in the state of Washington.
+
+
+# Graphic Analysis 4
+
+## Plot 5 - Geospatial Distribution of Teslas Across the US
+
+```{r plot5, echo=TRUE, fig.height=10, fig.width=10}
+
+   # Extracting extracting state and county information from raw dataset
   mapping <- raw |> 
     select("State",Make) |> 
     rename(make = Make, abb = "State")
@@ -217,7 +284,7 @@ lapply(map_packages, library, character.only=TRUE)
   state_mapping <- tibble(abb = state.abb,
                           name = state.name)
   
-  # creating a tibble with the vehicle make and the statename,countyname
+  # creating a tibble with the vehicle make and the state
   mapping <- mapping |> 
     left_join(state_mapping, join_by(abb)) |> 
     mutate(name = tolower(name)) |> 
@@ -239,8 +306,8 @@ lapply(map_packages, library, character.only=TRUE)
     geom_sf(data = mapping, aes(fill = n, geometry = geom), colour = "grey") +
     scale_fill_gradientn(colors = c("white", "red"),
                          trans = "log1p", 
-                         breaks = c(1, 10, 100, 1000, 10000, 100000),
-                         labels = c("1", "10", "100", "1k", "10k", "100k")) +
+                         breaks = c(1, 10, 100, 1000, 10000),
+                         labels = c("1", "10", "100", "1k", "10k")) +
     coord_sf(crs = st_crs(4326)) +
     theme(legend.position = "bottom",
           legend.direction = "horizontal",
@@ -262,6 +329,22 @@ lapply(map_packages, library, character.only=TRUE)
   
   # Print the map
   print(p)
-  
 
-  
+```
+
+
+## Plot 5 - Discussion
+
+As Teslas represent the overwhelming majority of registered EVs, it was interesting to see where they would end up after being registered in Washington. Its no surprise that most of the Teslas registered in Washington remain in Washington but also seem to find their way to states like California, Texas, Virginia and Maryland in non-trivial numbers. The presence of bigger cities in more populated states such as Texas and California would likely be better suited to EVs due to the abundance of charging stations. This could serve as a potential explanation for the lack of Teslas moving to more rural areas.
+
+
+# References
+
+### Dataset Download Page  
+ - https://catalog.data.gov/dataset/electric-vehicle-population-data  
+
+### Dataset Main Information Page
+ - https://data.wa.gov/Transportation/Electric-Vehicle-Population-Data/f6w7-q2d2/about_data  
+
+
+

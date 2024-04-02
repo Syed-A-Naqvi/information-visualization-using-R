@@ -107,7 +107,7 @@ p1 <- d_us_election |>
         legend.title = element_text(size = 15),
         legend.margin = margin(b = 10, unit = "pt")) +
   labs(title = "2016 US Presidential General Election     (coloured by state-party win)", fill = "Party")
-
+p1
 view(county_map[1:10,])
 view(county_data[1:10,])
 
