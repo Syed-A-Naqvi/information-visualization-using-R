@@ -1,0 +1,155 @@
+---
+title: "Exam Practice"
+author: "Syed Naqvi - 100590852"
+date: "`r format(Sys.Date(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+## Loading Relevant Libraries
+
+```{r} 
+graphics.off()
+rm(list = ls())
+library(tidyverse)
+library(maps)
+library(socviz)
+library(ggthemes)
+library(sf)
+library(ozmaps)
+```
+
+## Part 1 - Scatter Plot and Regression
+
+### 1.
+  - we can create a scatter plot that compares the engine fuel displacement and highway mileage, colored by number of cylinders
+
+```{r, fig.height=5, fig.width=7}
+mpg |> 
+  ggplot(aes(x = displ, y = hwy, colour = cyl)) +
+  geom_point()
+```
+
+### 2.
+  - The cylinders aesthetic is currently mapped to a continuous scale but we need to create a discrete colour mapping
+  - we can first mutate the cylinder variable to a factor which will treat the values as categorical as opposed to continuous
+
+```{r, fig.height=5, fig.width=7}
+mpg |>
+  mutate(cyl = factor(cyl)) |> 
+  ggplot(aes(x = displ, y = hwy, colour = cyl)) +
+  geom_point() +
+  labs(title = "Vehicle highway mileage by engine displacement and cylinders",
+       x = "Highway Milage (miles/gallons)",
+       y = "Engine Displacement (Litres)",
+       colour = "# Cylinders") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 14, face = "bold"),
+        axis.title = element_text(face = "bold"),
+        legend.background = element_rect(colour = "black"))
+```
+
+### 3. 4. 5.
+  - we can overlay linear regression fits to our graph with separate fits for each cylinder
+
+```{r, fig.height=5, fig.width=7}
+mpg |>
+  mutate(cyl = factor(cyl)) |> 
+  ggplot(aes(x = displ, y = hwy, colour = cyl, fill = cyl)) +
+  geom_point() +
+  geom_smooth(method = "lm", alpha = 0.1) +
+  labs(title = "Vehicle highway mileage by engine displacement and cylinders",
+       x = "Highway Milage (miles/gallons)",
+       y = "Engine Displacement (Litres)",
+       colour = "# Cylinders") +
+  guides(fill = "none")
+```
+
+## Part 2 - Playing with colour
+
+### 6.
+  - Hue is the actual colour like blue, red, green, yellow, purple, etc...
+  - Chroma is the intensity of the colour so very high chroma for the hue of blue would be intense and rich blue while low chroma
+    - for the colour of blue would essentially be grey
+  - Luminance is the brightness, so high luminance is just white while low luminance is black
+
+```{r, fig.height=5, fig.width=7}
+
+load("./Final Worksheet/W6-8.RData")
+
+ggplot(d_p2, aes(x = cond, y = yval, fill = cond)) +
+  geom_col()
+
+```
+
+### 9.
+  - Hue is the actual colour like blue, red, green, yellow, purple, etc...
+  - Chroma is the intensity of the colour so very high chroma for the hue of blue would be intense and rich blue while low chroma
+    - for the colour of blue would essentially be grey
+  - Luminance is the brightness, so high luminance is just white while low luminance is black
+
+```{r, fig.height=5, fig.width=7}
+
+ggplot(d_p2, aes(x = cond, y = yval, fill = cond)) +
+  geom_col() +
+  scale_fill_hue(h.start = 0, h = c(0, 65))
+
+```
+
+## Part 3 - Proportional Data
+
+### 11.
+
+```{r, fig.height=7, fig.width=7}
+
+d_p3 <- d_p3 |> 
+  mutate(Response = factor(Response,
+                           levels = c(1,2,3,4,5),
+                           labels = c("Never", "Rarely", "Sometimes", "Often", "Always")),
+         Gender = factor(Gender,
+                         levels = c(1,2),
+                         labels = c("women", "men")))
+p <- d_p3 |> 
+  ggplot(aes(x = "", y = Summary, fill = Response)) +
+  geom_col(colour = "aliceblue", linewidth = 0.25) +
+  coord_polar(theta = "y") +
+  facet_wrap(~Gender) +
+  scale_y_continuous(breaks = seq(from = 0.1, to = 1, by = 0.1),
+                     labels = scales::label_percent(scale = 100, suffix = "%")) +
+  scale_fill_brewer(palette = "Blues") +
+  labs(title = "A meta-survey: \"How much do you hate surveys?\"",
+       x = NULL, y = NULL) +
+  guides(fill = guide_legend(Reverse = TRUE)) +
+  theme_economist_white()+
+  theme(legend.direction = "horizontal",
+        legend.position = "bottom",
+        legend.text = element_text(size = 10))
+  
+p
+```
+
+
+## Part 4 - Correlation Plots
+
+### 6.
+  - Hue is the actual colour like blue, red, green, yellow, purple, etc...
+
+``` {r, fig.height = 7, fig.width = 7}
+library(GGally)
+
+ggcorr(mtcars, name = expression(Correlation~italic(rho)), label = TRUE, nbreaks = 9, palette = "RdBu", label_size = 3.5, label_alpha = TRUE, legend.size = 12) +
+  labs(title = "Correlation of Vehicle Properties")
+
+```
+
+```{r, fig.width=7, fig.height=7}
+
+d_ny <- map_data("county") |> 
+  filter(region == "new york")
+
+
+```
+
+

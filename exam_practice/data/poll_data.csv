@@ -1,0 +1,40 @@
+Issue,Opinion,Proportion
+Economy,Approve,38
+Economy,Disapprove,59
+Economy,No.opinion,3
+Education,Approve,49
+Education,Disapprove,40
+Education,No.opinion,11
+Energy policy,Approve,47
+Energy policy,Disapprove,42
+Energy policy,No.opinion,11
+Environment,Approve,43
+Environment,Disapprove,51
+Environment,No.opinion,6
+Federal budget deficit,Approve,31
+Federal budget deficit,Disapprove,64
+Federal budget deficit,No.opinion,5
+Foreign affairs,Approve,44
+Foreign affairs,Disapprove,48
+Foreign affairs,No.opinion,8
+Healthcare policy,Approve,40
+Healthcare policy,Disapprove,57
+Healthcare policy,No.opinion,3
+Immigration,Approve,29
+Immigration,Disapprove,62
+Immigration,No.opinion,9
+Race relations,Approve,52
+Race relations,Disapprove,38
+Race relations,No.opinion,10
+Situation in Afghanistan,Approve,36
+Situation in Afghanistan,Disapprove,57
+Situation in Afghanistan,No.opinion,7
+Situation in Iraq,Approve,41
+Situation in Iraq,Disapprove,53
+Situation in Iraq,No.opinion,6
+Taxes,Approve,41
+Taxes,Disapprove,54
+Taxes,No.opinion,5
+Terrorism,Approve,48
+Terrorism,Disapprove,45
+Terrorism,No.opinion,7
