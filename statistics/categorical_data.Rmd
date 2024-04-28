@@ -11,3 +11,106 @@ output:
 ## About
 This notebook will utilize visualization tools including bar graphs or histograms, Venn diagrams and two-way tables to analyze patterns or relationships in categorical data.
 
+
+### Initializing Environment and Loading Libraries
+```{r}
+graphics.off()
+rm(list = ls())
+library(patchwork)
+library(tidyverse)
+library(ggrepel)
+```
+
+## Dog Breed Histogram
+```{r, fig.height=3, fig.width=5}
+d <- tibble(
+  color = c("Blue", "Green", "Red", "Yellow", "Pink"),
+  n = c(60, 105, 45, 90, 90)
+)
+
+ggplot(d, aes(x=color, y=n))+
+  geom_col(width = 0.7, fill = d$color) +
+  scale_y_continuous(limits = c(0, max(d$n)+10),
+                     breaks = seq(from=0, to=max(d$n)+10, by = 10),
+                     expand = c(0,0))+
+  theme_bw() +
+  labs(x="Eye Color",y="Number of Students", title = "Number of Studnets per Eye Color")
+```
+
+## Test Grades Bar Chart
+```{r, fig.height=2, fig.width=4}
+
+get_mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+d <- tibble(
+  name = c("Ishaan", "Emily", "Daniel", "Jessica", "William"),
+  midterm = c(90, 90, 60, 100, 80),
+  final = c(100, 100, 100, 75, 80)
+  )
+d_long <- d |> 
+  pivot_longer(
+    cols = c(midterm, final),
+    values_to = "grade",
+    names_to = "test_type"
+  ) |> 
+  mutate(test_type = factor(test_type, levels = c("midterm", "final")))
+
+ggplot(d_long, aes(x = name, y = grade, fill = test_type))+
+  geom_col(width = 0.7, position = position_dodge(width = 0.7))
+
+summary <- d |> 
+  summarise(final_median = median(final),
+            midterm_midrange = (max(midterm) + min(midterm))/2,
+            final_avg = mean(final),
+            final_mode = get_mode(final),
+            midterm_range = max(midterm)-min(midterm))
+summary <- summary |> 
+  pivot_longer(cols = names(summary),
+               names_to = "stat",
+               values_to = "value")
+summary
+ggplot(summary, aes(y=stat, x=value)) +
+  geom_col(color = "black", alpha=0) +
+  theme_bw()
+
+```
+
+## Monthly Sales Percentage Pie Chart
+```{r, fig.height=10, fig.width=10}
+months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+months <- factor(months, levels = months)
+
+s <- tibble(
+  month = months,
+  percent_sales = c(0.18, 0.1, 0.07, 0.05, 0.05, 0.03, 0.03, 0.09, 0.07, 0.08, 0.13, 0.12)
+) |> 
+  arrange(desc(month)) |> 
+  mutate(cumsum = cumsum(percent_sales),
+         pos = cumsum - percent_sales/2,
+         label = scales::percent(percent_sales))
+s |> 
+  ggplot(aes(x="", y=percent_sales, fill = month)) +
+  geom_col(width=1, color="black", linewidth = 0.2) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Set3") +
+  geom_label_repel(aes(y = pos, label = label),
+                   size = 2.5,
+                   nudge_x = 0.7,
+                   show.legend = FALSE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
