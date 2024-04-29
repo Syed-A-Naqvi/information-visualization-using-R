@@ -18,7 +18,6 @@ graphics.off()
 rm(list = ls())
 library(patchwork)
 library(tidyverse)
-library(ggrepel)
 ```
 
 ## Dog Breed Histogram
@@ -79,7 +78,10 @@ ggplot(summary, aes(y=stat, x=value)) +
 ```
 
 ## Monthly Sales Percentage Pie Chart
-```{r, fig.height=10, fig.width=10}
+```{r, fig.height=5, fig.width=5}
+
+library(ggrepel)
+
 months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 months <- factor(months, levels = months)
 
@@ -99,13 +101,44 @@ s |>
   geom_label_repel(aes(y = pos, label = label),
                    size = 2.5,
                    nudge_x = 0.7,
-                   show.legend = FALSE)
+                   show.legend = FALSE) +
+  theme_minimal() +
+  theme(axis.line = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank())
+```
+
+## Creating Frequency Table Using Given Information
+
+Kirti knows the following information from a study on cold medicine that included 60 participants:
+
+- 30 participants in total received cold medicine.
+- 26 participants in total had a cold that lasted longer than 7 days.
+- 14 participants received cold medicine but had a cold that lasted longer than 7 days.
+
+```{r}
+
+a11 <- 14
+a21 <- 30 - 14
+a12 <- 26 - 14
+a22 <- 60 - 26 - a21
+
+two_way_matrix <- matrix(c(a11, a12, a21, a22), nrow = 2, byrow = TRUE)
+two_way_table <- as.table(two_way_matrix)
+dimnames(two_way_table) <- list('Duration of Cold' = c('longer than 7 days', 'shorter than 7 days'),
+                                'Medicine' = c('Received', 'Not Received'))
+print(two_way_table)
+
 ```
 
 
-
-
-
+```{r}
+round((41/44)*100, digits = 2)
+x <- 75/0.3
+x
+```
 
 
 
