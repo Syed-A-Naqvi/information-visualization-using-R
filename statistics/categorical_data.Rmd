@@ -133,11 +133,23 @@ print(two_way_table)
 
 ```
 
+## Conditional Distribution Stacked-Bar Plot
+```{r}
+d <- tibble(
+  PetSource = c("Store or breeder", "Stray", "Shelter", "Family or friends"),
+  Dogs = c(65, 11, 65, 35),
+  Cats = c(5, 30, 49, 31),
+  Total = c(70, 41, 114, 66)
+)
+
+d
+
+```
+
 
 ```{r}
-round((41/44)*100, digits = 2)
-x <- 75/0.3
-x
+round((56/110)*100, digits = 2)
+
 ```
 
 
