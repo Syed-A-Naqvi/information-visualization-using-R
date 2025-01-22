@@ -144,11 +144,24 @@ d <- tibble(
 
 d
 
+d <- d |> 
+  pivot_longer(c('Dogs', 'Cats'), names_to = 'pet', values_to = 'count') |> 
+  relocate(Total, .after=count) |> 
+  mutate(percent_of_total = count/Total) |> 
+  mutate(Total = NULL)
+
+d |> 
+  ggplot(aes(x=PetSource, y=percent_of_total, fill=pet)) +
+  geom_col(color = "black", linewidth=0.2) +
+  scale_fill_brewer(palette = "Set1") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_bw()
+
 ```
 
 
 ```{r}
-round((56/110)*100, digits = 2)
+round((2*85+84+83+81)/5, digits = 2)
 
 ```
 
